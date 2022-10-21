@@ -1,4 +1,5 @@
-import bpy      
+import bpy
+import re     
 
         
 class Enums(bpy.types.PropertyGroup):
@@ -40,12 +41,15 @@ class OutfitCreatorPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout 
-        layout.label(text="Create a custom outfit!")
+        layout.label(text="Create a custom outfit using the assets in the library!")
         row = layout.row()
         scene = context.scene
         mytool = scene.my_tool
         
         layout.prop(mytool, "my_string")
+        
+        layout.label(text="Please use a blank space to separate words.")
+        row2 = layout.row()
         layout.prop(mytool, "my_enum_top")   
         layout.prop(mytool, "my_enum_bottom")
         layout.prop(mytool, "my_enum_footwear")
@@ -65,7 +69,18 @@ class OutfitCreatorOperator(bpy.types.Operator):
         mytool = scene.my_tool
         
         
-        # def enforce_naming(string):
+        def enforce_naming(string):
+            bad_chars = [",","&","*","^"]
+            for char in bad_chars:
+                if char in string:
+                    self.report({'ERROR'}, "Name contains irregular characters, please review")
+                    
+            chunks = re.split(" ",string)
+            
+            
+            new_name = "_".join(map(lambda  chunk: chunk.upper(), chunks))
+            #self.report({'INFO'}, new_name)
+            return new_name
         #def load_mesh(path):
               
         
@@ -87,14 +102,15 @@ class OutfitCreatorOperator(bpy.types.Operator):
         if mytool.my_enum_bottom == 'OP3':
             bpy.context.object.name = mytool.my_string
         
-        if mytool.my_enum_footwear == 'OP1':         
-            bpy.context.object.name = mytool.my_string       
+        if mytool.my_enum_footwear == 'OP1': 
+            bpy.ops.mesh.primitive_monkey_add(size=5.0)        
+            bpy.context.object.name = enforce_naming(mytool.my_string)       
             
         if mytool.my_enum_footwear == 'OP2':
-            bpy.context.object.name = mytool.my_string
+            enforce_naming(mytool.my_string)
             
         if mytool.my_enum_footwear == 'OP3':
-            bpy.context.object.name = mytool.my_string
+            enforce_naming(mytool.my_string)
         
         return {'FINISHED'}
     
@@ -111,10 +127,11 @@ def unregister():
     bpy.utils.unregister_class(OutfitCreatorOperator)
     del bpy.types.Scene.my_tool
 
-def load_paths():
-    with open ("meshes_abspath.txt", 'r') as input_file:
-        paths = [line.rstrip() for line in input_file.readlines()]
-        print(paths)
+#asset library
+# def load_paths():
+#     with open ("meshes_abspath.txt", 'r') as input_file:
+#         paths = [line.rstrip() for line in input_file.readlines()]
+#         print(paths)
  
 if __name__ == "__main__":
     register()
