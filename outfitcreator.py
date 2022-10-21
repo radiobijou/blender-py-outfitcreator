@@ -1,4 +1,3 @@
-from enum import Enum
 import bpy      
 
         
@@ -6,36 +5,34 @@ class Enums(bpy.types.PropertyGroup):
     
     my_string : bpy.props.StringProperty(name= "Name Your Outfit")
     
-   # my_float_vector : bpy.props.FloatVectorProperty(name= "Scale", soft_min= 0, soft_max= 1000, default= (1,1,1))
-    
     my_enum_top : bpy.props.EnumProperty(
         name= "Top Style",
         description= "sample text",
-        items= [('OP1', "Top Style 01", ""),
-                ('OP2', "Top Style 02", ""),
-                ('OP3', "Top Style 03", "")
+        items= [('OP1', "Casual", ""),
+                ('OP2', "Cyberpunk", ""),
+                ('OP3', "Office", "")
         ]
     )
     my_enum_bottom : bpy.props.EnumProperty(
         name= "Bottom Style",
         description= "sample text",
-        items= [('OP1', "Bottom Style 01", ""),
-                ('OP2', "Bottom Style 02", ""),
-                ('OP3', "Bottom Style 03", "")
+        items= [('OP1', "Casual", ""),
+                ('OP2', "Cyberpunk", ""),
+                ('OP3', "Office", "")
         ]
     )
     my_enum_footwear : bpy.props.EnumProperty(
         name= "Footwear Style",
         description= "sample text",
-        items= [('OP1', "Footwear Style 01", ""),
-                ('OP2', "Footwear Style 02", ""),
-                ('OP3', "Footwear Style 03", "")
+        items= [('OP1', "Casual", ""),
+                ('OP2', "Cyberpunk", ""),
+                ('OP3', "Office", "")
         ]
     )
     
     
 class OutfitCreatorPanel(bpy.types.Panel):
-    bl_idname = "OUTFITCREATOR_main_panel"
+    bl_idname = "outfitcreator"
     bl_label = "Full-body Outfit Creator"
     bl_space_type = "VIEW_3D"
     bl_region_type = "UI"
@@ -53,13 +50,13 @@ class OutfitCreatorPanel(bpy.types.Panel):
         layout.prop(mytool, "my_enum_bottom")
         layout.prop(mytool, "my_enum_footwear")
  
-        layout.operator("addonname.myop_operator")
+        layout.operator("outfitcreator.operator")
         
         
 
 class OutfitCreatorOperator(bpy.types.Operator):
     bl_label = "Export Outfit"
-    bl_idname = "addonname.myop_operator"
+    bl_idname = "outfitcreator.operator"
     
     
     
@@ -69,7 +66,8 @@ class OutfitCreatorOperator(bpy.types.Operator):
         
         
         # def enforce_naming(string):
-            
+        #def load_mesh(path):
+              
         
         if mytool.my_enum_top == 'OP1':
             bpy.context.object.name = mytool.my_string       
@@ -90,15 +88,12 @@ class OutfitCreatorOperator(bpy.types.Operator):
             bpy.context.object.name = mytool.my_string
         
         if mytool.my_enum_footwear == 'OP1':         
-            bpy.ops.mesh.primitive_monkey_add(size=5.0)
             bpy.context.object.name = mytool.my_string       
             
         if mytool.my_enum_footwear == 'OP2':
-            bpy.ops.mesh.primitive_monkey_add(size=5.0)
             bpy.context.object.name = mytool.my_string
             
         if mytool.my_enum_footwear == 'OP3':
-            bpy.ops.mesh.primitive_monkey_add(size=5.0)
             bpy.context.object.name = mytool.my_string
         
         return {'FINISHED'}
@@ -108,7 +103,7 @@ def register():
     bpy.utils.register_class(Enums)
     bpy.utils.register_class(OutfitCreatorPanel)
     bpy.utils.register_class(OutfitCreatorOperator)
-    #bpy.types.Scene.my_tool = bpy.props.PointerProperty(type= Enumerators)
+    bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=Enums)
  
 def unregister():
     bpy.utils.unregister_class(Enums)
@@ -116,7 +111,10 @@ def unregister():
     bpy.utils.unregister_class(OutfitCreatorOperator)
     del bpy.types.Scene.my_tool
 
- 
+def load_paths():
+    with open ("meshes_abspath.txt", 'r') as input_file:
+        paths = [line.rstrip() for line in input_file.readlines()]
+        print(paths)
  
 if __name__ == "__main__":
     register()
