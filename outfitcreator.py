@@ -1,5 +1,6 @@
 import bpy
-import re     
+import re   
+import os  
 
         
 class Enums(bpy.types.PropertyGroup):
@@ -66,45 +67,42 @@ class OutfitCreatorOperator(bpy.types.Operator):
     
     def execute(self, context):
         scene = context.scene
-        mytool = scene.my_tool
-        
-        
+        mytool = scene.my_tool              
         def enforce_naming(string):
+            #TODO: add all irregular characters
             bad_chars = [",","&","*","^"]
             for char in bad_chars:
                 if char in string:
                     self.report({'ERROR'}, "Name contains irregular characters, please review")
                     
             chunks = re.split(" ",string)
-            
-            
             new_name = "_".join(map(lambda  chunk: chunk.upper(), chunks))
+            #TODO: add suffix
             #self.report({'INFO'}, new_name)
             return new_name
-        #def load_mesh(path):
               
         
-        if mytool.my_enum_top == 'OP1':
-            bpy.context.object.name = mytool.my_string       
+        # if mytool.my_enum_top == 'OP1':
+        #     bpy.context.object.name = mytool.my_string       
             
-        if mytool.my_enum_top == 'OP2':
-            bpy.context.object.name = mytool.my_string
+        # if mytool.my_enum_top == 'OP2':
+        #     bpy.context.object.name = mytool.my_string
             
-        if mytool.my_enum_top == 'OP3':
-            bpy.context.object.name = mytool.my_string
+        # if mytool.my_enum_top == 'OP3':
+        #     bpy.context.object.name = mytool.my_string
         
-        if mytool.my_enum_bottom == 'OP1':
-            bpy.context.object.name = mytool.my_string        
+        # if mytool.my_enum_bottom == 'OP1':
+        #     bpy.context.object.name = mytool.my_string        
             
-        if mytool.my_enum_bottom == 'OP2':
-            bpy.context.object.name = mytool.my_string
+        # if mytool.my_enum_bottom == 'OP2':
+        #     bpy.context.object.name = mytool.my_string
             
-        if mytool.my_enum_bottom == 'OP3':
-            bpy.context.object.name = mytool.my_string
+        # if mytool.my_enum_bottom == 'OP3':
+        #     bpy.context.object.name = mytool.my_string
         
-        if mytool.my_enum_footwear == 'OP1': 
-            bpy.ops.mesh.primitive_monkey_add(size=5.0)        
-            bpy.context.object.name = enforce_naming(mytool.my_string)       
+        if mytool.my_enum_footwear == 'OP1':            
+            bpy.ops.import_scene.obj(filepath="C:/Users/juni perru/rpm/obj/top_casual_01.obj")     
+            enforce_naming(mytool.my_string)       
             
         if mytool.my_enum_footwear == 'OP2':
             enforce_naming(mytool.my_string)
@@ -127,11 +125,9 @@ def unregister():
     bpy.utils.unregister_class(OutfitCreatorOperator)
     del bpy.types.Scene.my_tool
 
-#asset library
-# def load_paths():
-#     with open ("meshes_abspath.txt", 'r') as input_file:
-#         paths = [line.rstrip() for line in input_file.readlines()]
-#         print(paths)
+def make_path_absolute(key):
+    return bpy.path.abspath(key)
+
  
 if __name__ == "__main__":
     register()
