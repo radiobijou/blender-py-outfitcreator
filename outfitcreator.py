@@ -1,8 +1,10 @@
+from posixpath import abspath
 import bpy
 import re   
 import os  
 
-        
+#import_paths = [r"/obj/top_casual_01.obj"]  
+  
 class Enums(bpy.types.PropertyGroup):
     
     my_string : bpy.props.StringProperty(name= "Name Your Outfit")
@@ -101,7 +103,6 @@ class OutfitCreatorOperator(bpy.types.Operator):
         #     bpy.context.object.name = mytool.my_string
         
         if mytool.my_enum_footwear == 'OP1':            
-            bpy.ops.import_scene.obj(filepath="C:/Users/juni perru/rpm/obj/top_casual_01.obj")     
             enforce_naming(mytool.my_string)       
             
         if mytool.my_enum_footwear == 'OP2':
@@ -125,9 +126,12 @@ def unregister():
     bpy.utils.unregister_class(OutfitCreatorOperator)
     del bpy.types.Scene.my_tool
 
-def make_path_absolute(key):
-    return bpy.path.abspath(key)
-
+#TODO: proper loading
+# def load_assets():
+#     for path in import_paths:
+#         abspath = os.path.realpath(path)
+#         bpy.ops.import_scene.obj(abspath)
  
 if __name__ == "__main__":
     register()
+#    load_assets()
