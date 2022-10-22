@@ -7,31 +7,39 @@ import os
   
 class Enums(bpy.types.PropertyGroup):
     
-    my_string : bpy.props.StringProperty(name= "Name Your Outfit")
+    name_string : bpy.props.StringProperty(name= "Name Your Outfit")
     
-    my_enum_top : bpy.props.EnumProperty(
+    enum_top : bpy.props.EnumProperty(
         name= "Top Style",
         description= "sample text",
-        items= [('OP1', "Casual", ""),
-                ('OP2', "Cyberpunk", ""),
-                ('OP3', "Office", "")
+        items= [('CASUAL', "Casual", ""),
+                ('CYBERPUNK', "Cyberpunk", ""),
+                ('OFFICE', "Office", "")
         ]
     )
-    my_enum_bottom : bpy.props.EnumProperty(
+    enum_bottom : bpy.props.EnumProperty(
         name= "Bottom Style",
         description= "sample text",
-        items= [('OP1', "Casual", ""),
-                ('OP2', "Cyberpunk", ""),
-                ('OP3', "Office", "")
+        items= [('CASUAL', "Casual", ""),
+                ('CYBERPUNK', "Cyberpunk", ""),
+                ('OFFICE', "Office", "")
         ]
     )
-    my_enum_footwear : bpy.props.EnumProperty(
+    enum_footwear : bpy.props.EnumProperty(
         name= "Footwear Style",
         description= "sample text",
-        items= [('OP1', "Casual", ""),
-                ('OP2', "Cyberpunk", ""),
-                ('OP3', "Office", "")
+        items= [('CASUAL', "Casual", ""),
+                ('CYBERPUNK', "Cyberpunk", ""),
+                ('OFFICE', "Office", "")
         ]
+    )
+    enum_export_format :  bpy.props.EnumProperty(
+        name= "Export Format",
+        description="",
+        items= [('OBJ',".obj",""),
+                ('FBX',".fbx",""),
+                ('GLTF',".gltf",""),
+                ('GLB',".glb","")]
     )
     
     
@@ -44,28 +52,35 @@ class OutfitCreatorPanel(bpy.types.Panel):
 
     def draw(self, context):
         layout = self.layout 
-        layout.label(text="Create a custom outfit using the assets in the library!")
+        
         row = layout.row()
         scene = context.scene
         mytool = scene.my_tool
         
-        layout.prop(mytool, "my_string")
+        layout.prop(mytool, "name_string")
         
         layout.label(text="Please use a blank space to separate words.")
         row2 = layout.row()
-        layout.prop(mytool, "my_enum_top")   
-        layout.prop(mytool, "my_enum_bottom")
-        layout.prop(mytool, "my_enum_footwear")
+        layout.prop(mytool, "enum_top")   
+        layout.prop(mytool, "enum_bottom")
+        layout.prop(mytool, "enum_footwear")
  
+        row3 = layout.row()
+        layout.label(text="Please pick a format before exporting")
+        layout.prop(mytool, "enum_export_format")
+        
         layout.operator("outfitcreator.operator")
+        layout.operator("exporter.operator")
         
         
 
 class OutfitCreatorOperator(bpy.types.Operator):
-    bl_label = "Export Outfit"
+    bl_label = "Compose Outfit"
     bl_idname = "outfitcreator.operator"
     
-    
+    for item in bpy.data.objects:
+            if item.name.startswith('Armature'):
+                item.hide_set(True)
     
     def execute(self, context):
         scene = context.scene
@@ -82,48 +97,85 @@ class OutfitCreatorOperator(bpy.types.Operator):
             #TODO: add suffix
             #self.report({'INFO'}, new_name)
             return new_name
-              
+
+            #after collecting hidden, compose a parent object and name all of its components
+            #bpy.context.object.name = mytool.my_string
         
-        # if mytool.my_enum_top == 'OP1':
-        #     bpy.context.object.name = mytool.my_string       
-            
-        # if mytool.my_enum_top == 'OP2':
-        #     bpy.context.object.name = mytool.my_string
-            
-        # if mytool.my_enum_top == 'OP3':
-        #     bpy.context.object.name = mytool.my_string
+                
         
-        # if mytool.my_enum_bottom == 'OP1':
-        #     bpy.context.object.name = mytool.my_string        
+        if mytool.my_enum_top == 'CASUAL':
+            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(False)  
+            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Top_Office'].hide_set(True)   
             
-        # if mytool.my_enum_bottom == 'OP2':
-        #     bpy.context.object.name = mytool.my_string
+        if mytool.my_enum_top == 'CYBERPUNK':
+            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(True)
+            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(False)
+            bpy.data.objects['Wolf3D_Top_Office'].hide_set(True)
             
-        # if mytool.my_enum_bottom == 'OP3':
-        #     bpy.context.object.name = mytool.my_string
+        if mytool.my_enum_top == 'OFFICE':
+            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(True)
+            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Top_Office'].hide_set(False)
         
-        if mytool.my_enum_footwear == 'OP1':            
-            enforce_naming(mytool.my_string)       
+        if mytool.my_enum_bottom == 'CASUAL':
+            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(False)  
+            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(True)         
             
-        if mytool.my_enum_footwear == 'OP2':
-            enforce_naming(mytool.my_string)
+        if mytool.my_enum_bottom == 'CYBERPUNK':
+            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(True)  
+            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(False)
+            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(True)  
             
-        if mytool.my_enum_footwear == 'OP3':
-            enforce_naming(mytool.my_string)
+        if mytool.my_enum_bottom == 'OFFICE':
+            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(True)  
+            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(False)
+        
+        if mytool.my_enum_footwear == 'CASUAL':            
+            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(False)  
+            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(True)       
+            
+        if mytool.my_enum_footwear == 'CYBERPUNK':
+            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(True)  
+            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(False)
+            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(True)
+            
+        if mytool.my_enum_footwear == 'OFFICE':
+            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(True)  
+            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(True)
+            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(False)
         
         return {'FINISHED'}
-    
+
+
+class ExporterOperator(bpy.types.Operator):
+    bl_idname = "exporter.operator"
+    bl_label = "Export Outfit"
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        
+        return {"FINISHED"}
+ 
  
 def register():
     bpy.utils.register_class(Enums)
     bpy.utils.register_class(OutfitCreatorPanel)
     bpy.utils.register_class(OutfitCreatorOperator)
+    bpy.utils.register_class(ExporterOperator)
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=Enums)
  
 def unregister():
     bpy.utils.unregister_class(Enums)
     bpy.utils.unregister_class(OutfitCreatorPanel)
     bpy.utils.unregister_class(OutfitCreatorOperator)
+    bpy.utils.unregister_class(ExporterOperator)
     del bpy.types.Scene.my_tool
 
 #TODO: proper loading
