@@ -111,23 +111,7 @@ class OutfitCreatorOperator(bpy.types.Operator):
             #after collecting hidden, compose a parent object and name all of its components
             #bpy.context.object.name = mytool.my_string
         
-        #TODO:refactor
-        # top_items = [('casual','cyberpunk','office'),('Wolf3D_Top_Casual','Wolf3D_Top_Cyberpunk', 'Wolf3D_Top_Office')]
-        # bottom_items = [('casual','cyberpunk','office'),('Wolf3D_Bottom_Casual','Wolf3D_Bottom_Cyberpunk', 'Wolf3D_Bottom_Office')]
-        # footwear_items = [('casual','cyberpunk','office'),('Wolf3D_Footwear_Casual','Wolf3D_Footwear_Cyberpunk', 'Wolf3D_Footwear_Office')]
-
-        # enum_items = [
-        # (mytool.enum_top), (self.top_items),
-        # (mytool.enum_bottom), (self.bottom_items),
-        # (mytool.enum_footwear), (self.footwear_items),
-        # ]      
-        
-        # for enum, category in enum_items:
-        #     for k, v in category.items():
-        #         visible = k == enum
-        #         bpy.data.objects[v].hide_set(visible)
-
-
+        #TODO:refactor       
         if mytool.enum_top == 'CASUAL':
             bpy.data.objects['Wolf3D_Top_Casual'].hide_set(False)  
             bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(True)
@@ -198,6 +182,7 @@ class GeneratorOperator(bpy.types.Operator):
             bpy.data.objects[random.choice(item)].hide_set(False)
         return {"FINISHED"}
 
+
 class ExporterOperator(bpy.types.Operator):
     bl_idname = "exporter.operator"
     bl_label = "Export Outfit"
@@ -208,10 +193,15 @@ class ExporterOperator(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        
-        #TODO Parent all visible to full body and export
         scene = context.scene
         mytool = scene.my_tool
+        
+        visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
+        objects = bpy.data.objects
+        parent = objects['FullBody_Armature']
+        for v in visible:
+            v.parent = parent
+        
         format = mytool.enum_export_format
         filepath = bpy.data.filepath
         directory = os.path.dirname(filepath)
