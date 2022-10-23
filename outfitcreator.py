@@ -78,6 +78,8 @@ class OutfitCreatorPanel(bpy.types.Panel):
         layout.prop(mytool, "enum_export_format")
          
         layout.operator("exporter.operator")
+        layout.operator("batch.operator")
+        
         
         
 
@@ -199,6 +201,13 @@ class ExporterOperator(bpy.types.Operator):
         visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
         objects = bpy.data.objects
         parent = objects['FullBody_Armature']
+
+        ### create copies of meshes in a new collection
+        ### hide all meshes 
+        ### parent to armature 
+        ### unhide all in the new collection before export
+        ### delete export collection
+        
         for v in visible:
             v.parent = parent
         
@@ -209,17 +218,36 @@ class ExporterOperator(bpy.types.Operator):
         if mytool.enum_export_format == 'fbx':
             getattr(bpy.ops.export_scene, format)(filepath=exportpath, 
                                                                      object_types={'ARMATURE','MESH'},
-                                                                     use_metadata=True)
+                                                                     use_visible=True)
         elif mytool.enum_export_format == 'obj':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath)
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, use_visible=True)
         elif mytool.enum_export_format == 'glb' :
             #uses the same function as gltf 
-            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB')
+            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB', use_visible=True)
         elif mytool.enum_export_format == 'gltf':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE')
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE', use_visible=True)
         self.report({'INFO'}, exportpath)
         return {"FINISHED"}
 
+class BatchOperator(bpy.types.Operator):
+    bl_idname = "batch.operator"
+    bl_label = "Batch Generate and Export"
+    bl_description = ""
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        combinations = []
+        for i in top_items:
+            for j in bottom_items:
+                for k in footwear_items:
+                        combinations.append((i, j, k))
+
+        for i in range(10):
+            self.report({'INFO'},''.join(combinations.pop(random.randrange(len(combinations)))))
+        return {"FINISHED"}
 
  
 def register():
@@ -228,6 +256,7 @@ def register():
     bpy.utils.register_class(OutfitCreatorOperator)
     bpy.utils.register_class(ExporterOperator)
     bpy.utils.register_class(GeneratorOperator)
+    bpy.utils.register_class(BatchOperator)
     bpy.types.Scene.my_tool = bpy.props.PointerProperty(type=Enums)
   
  
@@ -237,6 +266,7 @@ def unregister():
     bpy.utils.unregister_class(OutfitCreatorOperator)
     bpy.utils.unregister_class(ExporterOperator)
     bpy.utils.register_class(GeneratorOperator)
+    bpy.utils.unregister_class(BatchOperator)
     del bpy.types.Scene.my_tool
 
 #TODO: loading from folder or JSON
