@@ -1,11 +1,13 @@
-#TODO: generate with permutations
-#Use the command line to execute
 
 import bpy
 import re   
-import os  
+import os 
+import random
+import argparse 
 
-#import_paths = [r"/obj/top_casual_01.obj"]  
+top_items = ['Wolf3D_Top_Casual','Wolf3D_Top_Cyberpunk', 'Wolf3D_Top_Office']
+bottom_items = ['Wolf3D_Bottom_Casual','Wolf3D_Bottom_Cyberpunk', 'Wolf3D_Bottom_Office']
+footwear_items = ['Wolf3D_Footwear_Casual','Wolf3D_Footwear_Cyberpunk', 'Wolf3D_Footwear_Office']  
   
 class Enums(bpy.types.PropertyGroup):
     
@@ -82,6 +84,7 @@ class OutfitCreatorPanel(bpy.types.Panel):
 class OutfitCreatorOperator(bpy.types.Operator):
     bl_label = "Compose Outfit"
     bl_idname = "outfitcreator.operator"
+    bl_description = "Composes an outfit from the chosen pieces"
     
         
     for item in bpy.data.objects:
@@ -94,7 +97,7 @@ class OutfitCreatorOperator(bpy.types.Operator):
         mytool = scene.my_tool              
         def enforce_naming(string):
             #TODO: add all irregular characters
-            bad_chars = [",","&","*","^"]
+            bad_chars = [",","&","*","^","."]
             for char in bad_chars:
                 if char in string:
                     self.report({'ERROR'}, "Name contains irregular characters, please review")
@@ -174,20 +177,11 @@ class OutfitCreatorOperator(bpy.types.Operator):
 
 
 class GeneratorOperator(bpy.types.Operator):
+    #TODO: generate with permutations
+    #Use the command line to execute
     bl_idname = "generator.operator"
     bl_label = "Generate Random"
-
-    @classmethod
-    def poll(cls, context):
-        return True
-
-    def execute(self, context):
-        
-        return {"FINISHED"}
-
-class ExporterOperator(bpy.types.Operator):
-    bl_idname = "exporter.operator"
-    bl_label = "Export Outfit"
+    bl_description = "Generates a random combination of all pieces"
 
     @classmethod
     def poll(cls, context):
@@ -196,19 +190,41 @@ class ExporterOperator(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         mytool = scene.my_tool
+        items = [top_items, bottom_items, footwear_items]
+        for item in bpy.data.objects:
+            if item.name.startswith('Wolf3D'):
+                item.hide_set(True)
+        for item in items:
+            bpy.data.objects[random.choice(item)].hide_set(False)
+        return {"FINISHED"}
+
+class ExporterOperator(bpy.types.Operator):
+    bl_idname = "exporter.operator"
+    bl_label = "Export Outfit"
+    bl_description = "Exports a file of the chosen format in the .blend file location"
+
+    @classmethod
+    def poll(cls, context):
+        return True
+
+    def execute(self, context):
+        scene = context.scene
+        mytool = scene.my_tool
+        format = mytool.enum_export_format
         filepath = bpy.data.filepath
         directory = os.path.dirname(filepath)
         exportpath = "{}\{}.{}".format(directory, mytool.name_string, mytool.enum_export_format)
         if mytool.enum_export_format == 'fbx':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath, 
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, 
                                                                      object_types={'ARMATURE','MESH'},
                                                                      use_metadata=True)
         elif mytool.enum_export_format == 'obj':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath)
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath)
         elif mytool.enum_export_format == 'glb' :
+            #uses the same function as gltf 
             getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB')
         elif mytool.enum_export_format == 'gltf':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath, export_format='GLTF_SEPARATE')
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE')
         self.report({'INFO'}, exportpath)
         return {"FINISHED"}
 
@@ -231,7 +247,7 @@ def unregister():
     bpy.utils.register_class(GeneratorOperator)
     del bpy.types.Scene.my_tool
 
-#TODO: proper loading
+#TODO: loading from folder or JSON
 # def load_assets():
 #     for path in import_paths:
 #         abspath = os.path.realpath(path)
