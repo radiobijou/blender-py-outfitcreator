@@ -208,6 +208,8 @@ class ExporterOperator(bpy.types.Operator):
         return True
 
     def execute(self, context):
+        
+        #TODO Parent all visible to full body and export
         scene = context.scene
         mytool = scene.my_tool
         format = mytool.enum_export_format
