@@ -198,23 +198,18 @@ class ExporterOperator(bpy.types.Operator):
         mytool = scene.my_tool
         filepath = bpy.data.filepath
         directory = os.path.dirname(filepath)
+        exportpath = "{}\{}.{}".format(directory, mytool.name_string, mytool.enum_export_format)
         if mytool.enum_export_format == 'fbx':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=directory, 
-                                                                     check_existing=True,
+            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath, 
                                                                      object_types={'ARMATURE','MESH'},
                                                                      use_metadata=True)
         elif mytool.enum_export_format == 'obj':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=directory,
-                                                                      check_existing=True)
+            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath)
         elif mytool.enum_export_format == 'glb' :
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=directory,
-                                                                     check_existing=True, 
-                                                                      export_format='GLB')
+            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB')
         elif mytool.enum_export_format == 'gltf':
-            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=directory,
-                                                                     check_existing=True, 
-                                                                      export_format='GLTF_SEPARATE')
-        self.report({'INFO'}, directory)
+            getattr(bpy.ops.export_scene, mytool.enum_export_format)(filepath=exportpath, export_format='GLTF_SEPARATE')
+        self.report({'INFO'}, exportpath)
         return {"FINISHED"}
 
 
