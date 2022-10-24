@@ -147,9 +147,22 @@ def export(context, format, filename):
     scene = context.scene
     mytool = scene.my_tool
     
+    visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
+        
+    for v in visible:
+        v.select_set( state = True, view_layer = None)
+    
+    arm = bpy.data.objects['FullBody_Armature']
+    arm.hide_set(False)
+    arm.select_set( state = True, view_layer = None)
+    body = bpy.data.objects['Wolf3D_Body']
+    body.hide_set(False)
+    body.select_set( state = True, view_layer = None)
+    
     filepath = bpy.data.filepath
     directory = os.path.dirname(filepath)
-    exportpath = "{}\{}.{}".format(directory, filename, format)
+    
+    exportpath = os.path.join(directory,  "{}.{}".format(filename, format))
     if format == 'fbx':
         getattr(bpy.ops.export_scene, format)(filepath=exportpath, object_types={'ARMATURE','MESH'}, use_selection=True)
     elif format == 'obj':
@@ -191,17 +204,7 @@ class ExporterOperator(bpy.types.Operator):
             self.report({'ERROR'}, "Please, name your outfit")
             return {"FINISHED"}
  
-        visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
         
-        for v in visible:
-            v.select_set( state = True, view_layer = None)
-        
-        arm = bpy.data.objects['FullBody_Armature']
-        arm.hide_set(False)
-        arm.select_set( state = True, view_layer = None)
-        body = bpy.data.objects['Wolf3D_Body']
-        body.hide_set(False)
-        body.select_set( state = True, view_layer = None)
         
         filename = enforce_naming(mytool.name_string)
         exportpath = export(context, mytool.enum_export_format, filename)
@@ -220,14 +223,41 @@ class BatchOperator(bpy.types.Operator):
         return True
 
     def execute(self, context):
-        combinations = []
-        for i in top_items:
-            for j in bottom_items:
-                for k in footwear_items:
-                        combinations.append((i, j, k))
+        scene = context.scene
+        mytool = scene.my_tool
 
+        combinations = []
+        counter = 0
+                    
         for i in range(10):
-            self.report({'INFO'},''.join(combinations.pop(random.randrange(len(combinations)))))
+            for v in top_items.values():
+                bpy.data.objects[v].hide_set(True)  
+            for v in bottom_items.values():
+                bpy.data.objects[v].hide_set(True)  
+            for v in footwear_items.values():
+                bpy.data.objects[v].hide_set(True)
+            
+            
+            for i in top_items.values():
+                for j in bottom_items.values():
+                    for k in footwear_items.values():
+                            combinations.append((i, j, k))
+            
+
+            combination = combinations.pop(random.randrange(len(combinations)))
+            
+            for el in combination:
+                bpy.data.objects[el].hide_set(False)
+            
+            filename = mytool.name_string 
+            exportpath = export(context, mytool.enum_export_format, filename + 'ver-{}'.format(counter))   
+            export(context, mytool.enum_export_format, filename)
+            for el in combination:
+                bpy.data.objects[el].hide_set(True)
+            
+            counter += 1
+            
+            self.report({'INFO'},''.join(exportpath))
             
         return {"FINISHED"}
 
