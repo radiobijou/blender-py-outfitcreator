@@ -1,9 +1,7 @@
 
 # Full-body Outfit Creator Add-on
 
-<div style="text-align: center;">
-<img width="310" alt="Capture" src="https://user-images.githubusercontent.com/46087451/197389565-d3886106-9909-481f-996b-31b18481ddaa.PNG">
-</div>
+<img width="312" alt="Capture" src="https://user-images.githubusercontent.com/46087451/197553643-e7637a82-9e50-48d5-8603-38d09e335c26.PNG">
 
 ### Overview 
 
@@ -23,3 +21,6 @@ You can generate a random outift using the **Generate Random** button.
 
 ### Export format 
 Once happy with the combination, you can pick an export format and press the **Export Outfit button**. This action will create a 3D file in your working directory.
+
+### Batch Generation and Export
+Another way to use this tool would be clicking the **Batch Generate and Export** button which would create 10 different randomly generated combinations and export them in the .blend file location.
