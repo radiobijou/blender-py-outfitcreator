@@ -5,12 +5,24 @@ import os
 import random
 import argparse 
 
-top_items = ['Wolf3D_Top_Casual','Wolf3D_Top_Cyberpunk', 'Wolf3D_Top_Office']
-bottom_items = ['Wolf3D_Bottom_Casual','Wolf3D_Bottom_Cyberpunk', 'Wolf3D_Bottom_Office']
-footwear_items = ['Wolf3D_Footwear_Casual','Wolf3D_Footwear_Cyberpunk', 'Wolf3D_Footwear_Office']  
+top_items = {
+            'CASUAL': 'Wolf3D_Top_Casual',
+            'CYBERPUNK': 'Wolf3D_Top_Cyberpunk',
+            'OFFICE': 'Wolf3D_Top_Office'
+        }
 
+bottom_items = {
+            'CASUAL': 'Wolf3D_Bottom_Casual',
+            'CYBERPUNK': 'Wolf3D_Bottom_Cyberpunk',
+            'OFFICE': 'Wolf3D_Bottom_Office'
+        }
 
-
+footwear_items = {
+            'CASUAL': 'Wolf3D_Footwear_Casual',
+            'CYBERPUNK': 'Wolf3D_Footwear_Cyberpunk',
+            'OFFICE': 'Wolf3D_Footwear_Office'
+        }
+        
 class Enums(bpy.types.PropertyGroup):
     
     name_string : bpy.props.StringProperty(name= "Name Your Outfit")
@@ -98,51 +110,14 @@ class OutfitCreatorOperator(bpy.types.Operator):
         scene = context.scene
         mytool = scene.my_tool              
         
-        #TODO:refactor       
-        if mytool.enum_top == 'CASUAL':
-            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(False)  
-            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Top_Office'].hide_set(True)   
-            
-        if mytool.enum_top == 'CYBERPUNK':
-            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(True)
-            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(False)
-            bpy.data.objects['Wolf3D_Top_Office'].hide_set(True)
-            
-        if mytool.enum_top == 'OFFICE':
-            bpy.data.objects['Wolf3D_Top_Casual'].hide_set(True)
-            bpy.data.objects['Wolf3D_Top_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Top_Office'].hide_set(False)
+        for k, v in top_items.items():
+            bpy.data.objects[v].hide_set(k != mytool.enum_top)
         
-        if mytool.enum_bottom == 'CASUAL':
-            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(False)  
-            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(True)         
-            
-        if mytool.enum_bottom == 'CYBERPUNK':
-            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(True)  
-            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(False)
-            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(True)  
-            
-        if mytool.enum_bottom == 'OFFICE':
-            bpy.data.objects['Wolf3D_Bottom_Casual'].hide_set(True)  
-            bpy.data.objects['Wolf3D_Bottom_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Bottom_Office'].hide_set(False)
-        
-        if mytool.enum_footwear == 'CASUAL':            
-            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(False)  
-            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(True)       
-            
-        if mytool.enum_footwear == 'CYBERPUNK':
-            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(True)  
-            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(False)
-            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(True)
-            
-        if mytool.enum_footwear == 'OFFICE':
-            bpy.data.objects['Wolf3D_Footwear_Casual'].hide_set(True)  
-            bpy.data.objects['Wolf3D_Footwear_Cyberpunk'].hide_set(True)
-            bpy.data.objects['Wolf3D_Footwear_Office'].hide_set(False)
+        for k, v in bottom_items.items():
+            bpy.data.objects[v].hide_set(k != mytool.enum_bottom)
+    
+        for k, v in footwear_items.items():
+            bpy.data.objects[v].hide_set(k != mytool.enum_footwear)
         
         return {'FINISHED'}
 
@@ -159,13 +134,32 @@ class GeneratorOperator(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         mytool = scene.my_tool
-        items = [top_items, bottom_items, footwear_items]
+        items = [list(top_items.values()), list(bottom_items.values()), list(footwear_items.values())]
         for item in bpy.data.objects:
             if item.name.startswith('Wolf3D'):
                 item.hide_set(True)
         for item in items:
             bpy.data.objects[random.choice(item)].hide_set(False)
         return {"FINISHED"}
+
+
+def export(context, format, filename):
+    scene = context.scene
+    mytool = scene.my_tool
+    
+    filepath = bpy.data.filepath
+    directory = os.path.dirname(filepath)
+    exportpath = "{}\{}.{}".format(directory, filename, format)
+    if format == 'fbx':
+        getattr(bpy.ops.export_scene, format)(filepath=exportpath, object_types={'ARMATURE','MESH'}, use_selection=True)
+    elif format == 'obj':
+        getattr(bpy.ops.export_scene, format)(filepath=exportpath, use_selection=True)
+    elif format == 'glb' :
+        #uses the same function as gltf
+        getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB', use_selection=True)
+    elif format == 'gltf':
+        getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE', use_selection=True)
+    return exportpath
 
 
 class ExporterOperator(bpy.types.Operator):
@@ -198,33 +192,22 @@ class ExporterOperator(bpy.types.Operator):
             return {"FINISHED"}
  
         visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
-        #objects = bpy.data.objects
-        #parent = objects['FullBody_Armature']
-        
-        #TODO:
-        #exp_c = bpy.context.blend_data.collections.new(name='Export_Collection') 
-        #bpy.context.collection.children.link(exp_c)
-        #for all objects in export collection: bpy.context.object.name = mytool.my_string
         
         for v in visible:
             v.select_set( state = True, view_layer = None)
-            #v.parent = parent
         
-        format = mytool.enum_export_format
-        filepath = bpy.data.filepath
-        directory = os.path.dirname(filepath)
-               
-        exportpath = "{}\{}.{}".format(directory, filename, mytool.enum_export_format)
-        if mytool.enum_export_format == 'fbx':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, object_types={'ARMATURE','MESH'}, use_selection=True)
-        elif mytool.enum_export_format == 'obj':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, use_selection=True)
-        elif mytool.enum_export_format == 'glb' :
-            #uses the same function as gltf 
-            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB', use_selection=True)
-        elif mytool.enum_export_format == 'gltf':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE', use_selection=True)
-        self.report({'INFO'}, exportpath)
+        arm = bpy.data.objects['FullBody_Armature']
+        arm.hide_set(False)
+        arm.select_set( state = True, view_layer = None)
+        body = bpy.data.objects['Wolf3D_Body']
+        body.hide_set(False)
+        body.select_set( state = True, view_layer = None)
+        
+        filename = enforce_naming(mytool.name_string)
+        exportpath = export(context, mytool.enum_export_format, filename)
+        self.report({'INFO'}, "Export successful at location: {}".format(exportpath))
+        
+
         return {"FINISHED"}
 
 class BatchOperator(bpy.types.Operator):
@@ -245,6 +228,7 @@ class BatchOperator(bpy.types.Operator):
 
         for i in range(10):
             self.report({'INFO'},''.join(combinations.pop(random.randrange(len(combinations)))))
+            
         return {"FINISHED"}
 
  
