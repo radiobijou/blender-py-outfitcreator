@@ -110,7 +110,7 @@ class OutfitCreatorOperator(bpy.types.Operator):
             #self.report({'INFO'}, new_name)
             return new_name
 
-            #after collecting hidden, compose a parent object and name all of its components
+            
             #bpy.context.object.name = mytool.my_string
         
         #TODO:refactor       
@@ -163,8 +163,6 @@ class OutfitCreatorOperator(bpy.types.Operator):
 
 
 class GeneratorOperator(bpy.types.Operator):
-    #TODO: generate with permutations
-    #Use the command line to execute
     bl_idname = "generator.operator"
     bl_label = "Generate Random"
     bl_description = "Generates a random combination of all pieces"
@@ -201,14 +199,12 @@ class ExporterOperator(bpy.types.Operator):
         visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
         objects = bpy.data.objects
         parent = objects['FullBody_Armature']
-
-        ### create copies of meshes in a new collection
-        ### hide all meshes 
-        ### parent to armature 
-        ### unhide all in the new collection before export
-        ### delete export collection
+        
+        #exp_c = bpy.context.blend_data.collections.new(name='Export_Collection') 
+        #bpy.context.collection.children.link(exp_c) 
         
         for v in visible:
+            v.select_set( state = True, view_layer = None)
             v.parent = parent
         
         format = mytool.enum_export_format
@@ -216,16 +212,14 @@ class ExporterOperator(bpy.types.Operator):
         directory = os.path.dirname(filepath)
         exportpath = "{}\{}.{}".format(directory, mytool.name_string, mytool.enum_export_format)
         if mytool.enum_export_format == 'fbx':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, 
-                                                                     object_types={'ARMATURE','MESH'},
-                                                                     use_visible=True)
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, object_types={'ARMATURE','MESH'}, use_selection=True)
         elif mytool.enum_export_format == 'obj':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, use_visible=True)
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, use_selection=True)
         elif mytool.enum_export_format == 'glb' :
             #uses the same function as gltf 
-            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB', use_visible=True)
+            getattr(bpy.ops.export_scene, "gltf")(filepath=exportpath, export_format='GLB', use_selection=True)
         elif mytool.enum_export_format == 'gltf':
-            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE', use_visible=True)
+            getattr(bpy.ops.export_scene, format)(filepath=exportpath, export_format='GLTF_SEPARATE', use_selection=True)
         self.report({'INFO'}, exportpath)
         return {"FINISHED"}
 
