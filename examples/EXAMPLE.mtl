@@ -1,0 +1,54 @@
+# Blender MTL File: 'wip.blend'
+# Material Count: 4
+
+newmtl Wolf3D_Body
+Ns 179.999996
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.400000 0.400000 0.400000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\juni perru\\rpm\\outfit-blocks\\body\\fullbody-f-set-01.fbm\\Wolf3D-f-fullbody-N.jpg
+
+newmtl Wolf3D_Bottom_Cyberpunk_M
+Ns 18.000005
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.522727 0.522727 0.522727
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\juni perru\\rpm\\outfit-blocks\\bottom\\outfit-f-cyberpunk-04-v2-bottom\\outfit-f-cyberpunk-04-v2-bottom-N.jpg
+map_Kd C:\\Users\\juni perru\\rpm\\outfit-blocks\\bottom\\outfit-f-cyberpunk-04-v2-bottom\\outfit-f-cyberpunk-04-v2-bottom-D.jpg
+map_Ke C:\\Users\\juni perru\\rpm\\outfit-blocks\\bottom\\outfit-f-cyberpunk-04-v2-bottom\\outfit-f-cyberpunk-04-v2-bottom-E.jpg
+map_Ns C:\\Users\\juni perru\\rpm\\outfit-blocks\\bottom\\outfit-f-cyberpunk-04-v2-bottom\\outfit-f-cyberpunk-04-v2-bottom-R.jpg
+refl C:\\Users\\juni perru\\rpm\\outfit-blocks\\bottom\\outfit-f-cyberpunk-04-v2-bottom\\outfit-f-cyberpunk-04-v2-bottom-M.jpg
+
+newmtl Wolf3D_Outfit_Footwear.001
+Ns 455.549357
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\juni perru\\rpm\\outfit-blocks\\footwear\\outfit-f-office-01-v2-footwear\\outfit-f-office-01-v2-footwear-N.jpg
+map_Kd C:\\Users\\juni perru\\rpm\\outfit-blocks\\footwear\\outfit-f-office-01-v2-footwear\\outfit-f-office-01-v2-footwear-D.jpg
+map_Ns C:\\Users\\juni perru\\rpm\\outfit-blocks\\footwear\\outfit-f-office-01-v2-footwear\\outfit-f-office-01-v2-footwear-R.jpg
+
+newmtl Wolf3D_Outfit_Top
+Ns 19.664899
+Ka 1.000000 1.000000 1.000000
+Kd 1.000000 1.000000 1.000000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump C:\\Users\\juni perru\\rpm\\outfit-blocks\\top\\outfit-f-casual-01-v2-top\\outfit-f-casual-01-v2-top-N.jpg
+map_Kd C:\\Users\\juni perru\\rpm\\outfit-blocks\\top\\outfit-f-casual-01-v2-top\\outfit-f-casual-01-v2-top-D.jpg
+map_Ns C:\\Users\\juni perru\\rpm\\outfit-blocks\\top\\outfit-f-casual-01-v2-top\\outfit-f-casual-01-v2-top-R.jpg
