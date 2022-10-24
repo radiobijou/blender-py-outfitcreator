@@ -8,7 +8,9 @@ import argparse
 top_items = ['Wolf3D_Top_Casual','Wolf3D_Top_Cyberpunk', 'Wolf3D_Top_Office']
 bottom_items = ['Wolf3D_Bottom_Casual','Wolf3D_Bottom_Cyberpunk', 'Wolf3D_Bottom_Office']
 footwear_items = ['Wolf3D_Footwear_Casual','Wolf3D_Footwear_Cyberpunk', 'Wolf3D_Footwear_Office']  
-  
+
+
+
 class Enums(bpy.types.PropertyGroup):
     
     name_string : bpy.props.StringProperty(name= "Name Your Outfit")
@@ -88,30 +90,13 @@ class OutfitCreatorOperator(bpy.types.Operator):
     bl_idname = "outfitcreator.operator"
     bl_description = "Composes an outfit from the chosen pieces"
     
-        
     for item in bpy.data.objects:
             if item.name.startswith('Armature'):
                 item.hide_set(True)
     
-        
     def execute(self, context):
         scene = context.scene
         mytool = scene.my_tool              
-        def enforce_naming(string):
-            #TODO: add all irregular characters
-            bad_chars = [",","&","*","^","."]
-            for char in bad_chars:
-                if char in string:
-                    self.report({'ERROR'}, "Name contains irregular characters, please review")
-                    
-            chunks = re.split(" ",string)
-            new_name = "_".join(map(lambda  chunk: chunk.upper(), chunks))
-            #TODO: add suffix
-            #self.report({'INFO'}, new_name)
-            return new_name
-
-            
-            #bpy.context.object.name = mytool.my_string
         
         #TODO:refactor       
         if mytool.enum_top == 'CASUAL':
@@ -195,22 +180,41 @@ class ExporterOperator(bpy.types.Operator):
     def execute(self, context):
         scene = context.scene
         mytool = scene.my_tool
+
+        def enforce_naming(string):
+            #TODO: add all irregular characters
+            bad_chars = [",","&","*","^","."]
+            for char in bad_chars:
+                if char in string: 
+                    self.report({'ERROR'}, "Name contains irregular characters, please review")
+            chunks = re.split(" ",string)
+            new_name = "_".join(map(lambda  chunk: chunk.upper(), chunks))
+            #TODO: add suffix
+            return new_name
         
+        filename = enforce_naming(mytool.name_string)
+        if mytool.name_string == "":
+            self.report({'ERROR'}, "Please, name your outfit")
+            return {"FINISHED"}
+ 
         visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
-        objects = bpy.data.objects
-        parent = objects['FullBody_Armature']
+        #objects = bpy.data.objects
+        #parent = objects['FullBody_Armature']
         
+        #TODO:
         #exp_c = bpy.context.blend_data.collections.new(name='Export_Collection') 
-        #bpy.context.collection.children.link(exp_c) 
+        #bpy.context.collection.children.link(exp_c)
+        #for all objects in export collection: bpy.context.object.name = mytool.my_string
         
         for v in visible:
             v.select_set( state = True, view_layer = None)
-            v.parent = parent
+            #v.parent = parent
         
         format = mytool.enum_export_format
         filepath = bpy.data.filepath
         directory = os.path.dirname(filepath)
-        exportpath = "{}\{}.{}".format(directory, mytool.name_string, mytool.enum_export_format)
+               
+        exportpath = "{}\{}.{}".format(directory, filename, mytool.enum_export_format)
         if mytool.enum_export_format == 'fbx':
             getattr(bpy.ops.export_scene, format)(filepath=exportpath, object_types={'ARMATURE','MESH'}, use_selection=True)
         elif mytool.enum_export_format == 'obj':
