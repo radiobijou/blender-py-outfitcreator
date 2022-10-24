@@ -30,7 +30,8 @@ You can generate a random outift using the **Generate Random** button.
 
 ![Export](https://user-images.githubusercontent.com/46087451/197573963-06585ad8-8bce-4d7f-878a-0a285d7e80fc.gif)
 
-Once happy with the combination, you can pick an export format and press the **Export Outfit button**. This action will create a 3D file in the directory where your .blend file is located. This file contains the three clothing pieces, as well as a full body mesh and rig. What is specified in the textbox will be used as it's name.
+Once you're happy with the combination, pick an export format and press the **Export Outfit button**. This action will create a 3D file in the directory where your currently open .blend file is located. This file contains the three clothing pieces, as well as a full body mesh and rig. What is specified in the textbox will be used as it's name.
 
 ### Batch Generation and Export
-Another way to use this tool would be clicking the **Batch Generate and Export** button which would create 10 different randomly generated combinations and export them in the .blend file location.
+
+The most exciting way to use this tool is by clicking the **Batch Generate and Export** button. It creates 10 different randomly generated combinations and exports them in the .blend file location. They use the same name, while adding the version number at the end. You can find some of the exported outfits in the ```examples``` folder.
