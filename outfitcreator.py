@@ -3,7 +3,10 @@ import bpy
 import re   
 import os 
 import random
-import argparse 
+
+#TODO: 
+#refactor hardcoded values
+#refactor nested foor loops
 
 top_items = {
             'CASUAL': 'Wolf3D_Top_Casual',
@@ -51,6 +54,8 @@ class Enums(bpy.types.PropertyGroup):
                 ('OFFICE', "Office", "")
         ]
     )
+
+
     enum_export_format :  bpy.props.EnumProperty(
         name= "Export Format",
         description="",
@@ -71,23 +76,19 @@ class OutfitCreatorPanel(bpy.types.Panel):
     def draw(self, context):
         layout = self.layout 
         
-        row = layout.row()
         scene = context.scene
         mytool = scene.my_tool
         
         layout.prop(mytool, "name_string") 
         layout.label(text="Please use a blank space to separate words.")
         
-        row2 = layout.row()
         layout.prop(mytool, "enum_top")   
         layout.prop(mytool, "enum_bottom")
         layout.prop(mytool, "enum_footwear")
  
-        row3 = layout.row()
         layout.operator("outfitcreator.operator")
         layout.operator("generator.operator")
         
-        row4 = layout.row()
         layout.label(text="Please pick a format before exporting")
         layout.prop(mytool, "enum_export_format")
          
@@ -110,6 +111,8 @@ class OutfitCreatorOperator(bpy.types.Operator):
         scene = context.scene
         mytool = scene.my_tool              
         
+        # showing the chosen pieces
+
         for k, v in top_items.items():
             bpy.data.objects[v].hide_set(k != mytool.enum_top)
         
@@ -128,12 +131,12 @@ class GeneratorOperator(bpy.types.Operator):
     bl_description = "Generates a random combination of all pieces"
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls):
         return True
 
-    def execute(self, context):
-        scene = context.scene
-        mytool = scene.my_tool
+    # hiding all pieces
+
+    def execute(self):
         items = [list(top_items.values()), list(bottom_items.values()), list(footwear_items.values())]
         for item in bpy.data.objects:
             if item.name.startswith('Wolf3D'):
@@ -143,9 +146,7 @@ class GeneratorOperator(bpy.types.Operator):
         return {"FINISHED"}
 
 
-def export(context, format, filename):
-    scene = context.scene
-    mytool = scene.my_tool
+def export(format, filename):
     
     visible=[ob for ob in bpy.context.view_layer.objects if ob.visible_get()]
         
@@ -181,7 +182,7 @@ class ExporterOperator(bpy.types.Operator):
     bl_description = "Exports a file of the chosen format in the .blend file location"
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls):
         return True
 
     def execute(self, context):
@@ -189,14 +190,12 @@ class ExporterOperator(bpy.types.Operator):
         mytool = scene.my_tool
 
         def enforce_naming(string):
-            #TODO: add all irregular characters
             bad_chars = [",","&","*","^","."]
             for char in bad_chars:
                 if char in string: 
                     self.report({'ERROR'}, "Name contains irregular characters, please review")
             chunks = re.split(" ",string)
             new_name = "_".join(map(lambda  chunk: chunk.upper(), chunks))
-            #TODO: add suffix
             return new_name
         
         filename = enforce_naming(mytool.name_string)
@@ -219,7 +218,7 @@ class BatchOperator(bpy.types.Operator):
     bl_description = ""
 
     @classmethod
-    def poll(cls, context):
+    def poll(cls):
         return True
 
     def execute(self, context):
