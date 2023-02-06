@@ -3,6 +3,11 @@
 
 <img width="400" alt="Capture" src="https://user-images.githubusercontent.com/46087451/197553643-e7637a82-9e50-48d5-8603-38d09e335c26.PNG" >
 
+### TO DO: 
+
+- [ ] JSON File import
+- [ ] Refactor nested loops 
+
 ### Overview 
 
 Using this tool, you can preview and pick your favourite combinations of three-part outfits inside Blender. Afterwards, a model will be exported in the format of your choice.
@@ -35,3 +40,4 @@ Once you're happy with the combination, pick an export format and press the **Ex
 ### Batch Generation and Export
 
 The most exciting way to use this tool is by clicking the **Batch Generate and Export** button. It creates 10 different randomly generated combinations and exports them in the .blend file location. They use the same name, while adding the version number at the end. You can find some of the exported outfits in the ```examples``` folder.
+
